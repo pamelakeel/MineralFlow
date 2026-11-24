@@ -1,0 +1,101 @@
+
+/* Painel geoespacial */
+@media screen {
+    :root {
+        color-scheme: dark;
+        --navy: #e6f1f7;
+        --navy-light: #173040;
+        --text: #dfedf4;
+        --muted: #a0b7c7;
+        --background: #06131c;
+        --white: #0d202d;
+        --border: #233c4c;
+        --shadow: none;
+        --mf-blue: #71b9ec;
+        --mf-blue-dark: #356990;
+        --mf-blue-light: #152e40;
+    }
+    body { background: var(--background); color: var(--text); }
+    .sidebar {
+        background: #091923;
+        width: 224px; min-width: 224px;
+        border-right: 1px solid var(--border);
+    }
+    .sidebar .brand { padding-bottom: 17px; }
+    .sidebar .brand h1 { font-size: 20px; }
+    .sidebar .brand p { color: var(--muted); }
+    .brand-mark { background: #1a3e37; color: #9aecd0; border: 1px solid #3e7668; }
+    .sidebar nav a { color: #bdd0dd; }
+    .sidebar nav a.active { background: #12372e; color: #b9f3d9; border-left-color: #64d4aa; }
+    .sidebar nav a:hover { background: #173140; }
+    .topbar { padding: 12px clamp(15px, 2.5vw, 34px); background: #091923; min-height: 68px; }
+    .topbar h1 { font-size: clamp(1.1rem, 2vw, 1.5rem); letter-spacing: -.035em; }
+    .topbar p { color: var(--muted); }
+    .system-status { background: #14362c; color: #a9eacc; border-color: #315d50; }
+    .content { padding: clamp(12px, 2vw, 25px); }
+    .section-heading { margin-bottom: 9px; }
+    .section-heading h2, .section-heading span { color: var(--text); }
+    .section-heading span { color: var(--muted); }
+    .stats-grid { gap: 10px; }
+    .stat-card {
+        display: block; position: relative; padding: 12px 15px 12px 20px;
+        border: 1px solid var(--border); border-radius: 10px;
+        background: #0c202e; box-shadow: none; overflow: hidden;
+        --metric: #71b9ec;
+    }
+    .stat-card:nth-child(2) { --metric: #e2b762; }
+    .stat-card:nth-child(3) { --metric: #6dd4ab; }
+    .stat-card:nth-child(4) { --metric: #b6a5ec; }
+    .stat-card::before { content: ""; position: absolute; inset: 12px auto 12px 0; width: 3px; background: var(--metric); }
+    .stat-card p { color: var(--muted); margin-bottom: 3px; }
+    .stat-card h2 { color: var(--text); font-size: clamp(1.25rem, 2.05vw, 1.9rem); line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .metric-unit { color: var(--muted); font-size: .7em; font-weight: 500; }
+    .panel, .map-panel, .chart-card, #painelAnaliseLogistica {
+        background: #0d202d; color: var(--text);
+        border-color: var(--border); border-radius: 10px; box-shadow: none;
+    }
+    .panel h2, .chart-card h3, #painelAnaliseLogistica h2 { color: var(--text); }
+    #mapa-section { margin-top: 15px; }
+    .map-panel { padding: 11px; }
+    .map-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px 18px; flex-wrap: wrap; margin-bottom: 9px; }
+    .map-toolbar .map-filter-bar, .map-toolbar .legend { margin: 0; }
+    .map-toolbar .legend { color: var(--muted); }
+    .map-toolbar .legend span { white-space: nowrap; }
+    .legend .flow-key { width: 16px; height: 0; border-radius: 0; border-top: 2px dashed #79e2cf; }
+    .map-filter { background: #172e3d; color: #c8dce8; min-height: 36px; border: 1px solid #2b495c; }
+    .map-filter.active { background: #154139; color: #bff4dd; border-color: #4a8273; }
+    #mapa { height: clamp(340px, 51vh, 600px); background: #0b2939; border: 1px solid var(--border); border-radius: 7px; }
+    .leaflet-container .leaflet-control-attribution { background: #0b202deb; color: #cbdee9; }
+    .leaflet-control-attribution a { color: #9fd9fc; }
+    .leaflet-bar a, .leaflet-bar a:hover, .leaflet-control-layers {
+        background: #102a38; color: #e0f0f7; border-color: #2d4c60;
+    }
+    .leaflet-control-layers-toggle { filter: brightness(1.3); }
+    .map-note { color: var(--muted); margin-top: 7px; font-size: .75rem; }
+    .charts-grid { gap: 12px; }
+    .terminal-card, .result-panel, .terminal-results, .report-box {
+        background: #112936; border-color: var(--border); color: var(--text);
+    }
+    .terminal-card strong, .terminal-card p { color: var(--text); }
+    .terminal-card:has(.recommendation) { background: #10362f; border-color: #4a8273; }
+    .terminal-card .recommendation { color: #9aecd0; }
+    input, select { background: #0a1923; color: var(--text); border-color: #3a5264; }
+    button:not(.map-filter), .btn { background: #245173; color: #fff; }
+    .text-link { color: #9cdafc; }
+    .notice { background: #352a16; color: #f5d58b; }
+    .erro { background: #451f28; color: #ffc4ca; }
+    table { background: #0c202c; }
+    thead th, .table-scroll th { background: #193445; color: var(--text); }
+    tbody td { color: #c9dbe7; border-color: var(--border); }
+    tbody tr:nth-child(even) { background: #112837; }
+    tbody tr:hover { background: #193647; }
+    :focus-visible { outline: 2px solid #8ed9fb; outline-offset: 3px; }
+}
+@media screen and (max-width: 800px) {
+    .sidebar { width: 100%; min-width: 0; }
+    .sidebar .brand { margin-bottom: 8px; }
+    .map-toolbar { align-items: flex-start; flex-direction: column; }
+}
+@media print {
+    .map-toolbar, .map-note { display: none; }
+}

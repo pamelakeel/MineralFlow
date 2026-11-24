@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineralFlow | Gestão Logística Mineral</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --mf-blue: #477fae;
+            --mf-blue-dark: #315f87;
+            --mf-blue-light: #eaf4fc;
+            --mf-gold: #d9aa50;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #edf4fa;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #477fae 0%, #315f87 100%);
+        }
+
+        .sidebar .brand {
+            border-bottom-color: rgba(255,255,255,.2);
+        }
+
+        .sidebar nav a.active {
+            background: rgba(255,255,255,.19);
+            border-left: 3px solid #f2c36f;
+        }
+
+        .sidebar nav a:hover {
+            background: rgba(255,255,255,.12);
+        }
+
+        .welcome-banner {
+            background: linear-gradient(110deg, #477fae, #6d9fc7);
+        }
+
+        .stat-card,
+        .stat-item {
+            border-top: 3px solid #75a9d2;
+        }
+
+        .chart-card,
+        .panel,
+        .map-panel,
+        .content-card,
+        .section-card {
+            border-color: #dce8f2;
+        }
+
+        .chart-card h2,
+        .chart-card h3,
+        .panel h2,
+        .map-panel h2,
+        .content-card h2,
+        .section-card h2 {
+            color: #315f87;
+        }
+
+        .map-filter.active {
+            background: #477fae;
+            border-color: #477fae;
+        }
+
+        button[type="submit"] {
+            background: #477fae;
+        }
+
+        button[type="submit"]:hover {
+            background: #315f87;
+        }
+
+        .topbar {
+            border-bottom-color: #dce8f2;
+        }
+
+        .topbar h1,
+        .topbar h2 {
+            color: #315f87;
+        }
+
+        .stat-card h2,
+        .stat-item h2 {
+            color: #315f87;
+        }
+
+        .terminal-card {
+            border-left-color: #d9aa50;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0 15px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            color: #315f87;
+            font-size: 18px;
+        }
+
+        .section-heading span {
+            color: #8298ad;
+            font-size: 11px;
+        }
+
+        .system-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 12px;
+            background: #e8f7ef;
+            color: #32845d;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .system-status::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            background: #38a878;
+            border-radius: 50%;
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 39px;
+            height: 39px;
+            margin-bottom: 10px;
+            border-radius: 11px;
+            background: rgba(255,255,255,.17);
+            color: #fff;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .sidebar .brand h1 {
+            font-size: 22px;
+            letter-spacing: .4px;
+        }
+
+        .sidebar .brand p {
+            font-size: 10px;
+            letter-spacing: .5px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 13px 0;
+            color: #667d92;
+            font-size: 11px;
+        }
+
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend i {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .form-field {
+            min-width: 0;
+        }
+
+        .form-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .route-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .route-actions button {
+            min-width: 135px;
+        }
+
+        .route-actions button.secondary {
+            background: #eaf2f9;
+            color: #315f87;
+        }
+
+        .route-actions button.secondary:hover {
+            background: #dcebf7;
+        }
+
+        .report-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .report-area p {
+            color: #8292a4;
+            font-size: 12px;
+        }
+
+        .report-area button {
+            background: #477fae;
+            color: white;
+        }
+
+        @media (max-width: 700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-field.full {
+                grid-column: auto;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/geospatial.css') }}">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">M</div>
+            <h1>MineralFlow</h1>
+            <p>GESTÃO LOGÍSTICA MINERAL</p>
+        </div>
+
+        <nav>
+            <a href="#inicio" class="active">⌂ &nbsp; Visão geral</a>
+            <a href="#dashboard">▦ &nbsp; Indicadores</a>
+            <a href="#mapa-section">⌖ &nbsp; Mapa logístico</a>
+            <a href="#rotas-section">⇄ &nbsp; Planejamento de rotas</a>
+            <a href="#custos-section">▤ &nbsp; Análise de custos</a>
+            <a href="#terminais-section">▣ &nbsp; Terminais</a>
+            <a href="#fluxos-section">⇢ &nbsp; Fluxos minerais</a>
+            <a href="#relatorios-section">▧ &nbsp; Relatórios</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Painel de escoamento mineral</h1>
+                <p>Monitoramento e planejamento da logística mineral</p>
+            </div>
+
+            <div class="system-status">Dados demonstrativos</div>
+        </header>
+
+        <div class="content" id="inicio">
+
+            <section id="dashboard">
+                <div class="section-heading">
+                    <h2>Indicadores operacionais</h2>
+
+                </div>
+
+                <div class="stats-grid">
+                    <article class="stat-card">
+                        <p>Total de minas</p>
+                        <h2 id="totalMinas">--</h2>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Produção total</p>
+                        <h2><span id="totalProducao">--</span> <span class="metric-unit">t</span></h2>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Rotas analisadas</p>
+                        <h2 id="totalRotas">--</h2>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Destinos cadastrados</p>
+                        <h2 id="totalDestinos">--</h2>
+                    </article>
+                </div>
+            </section>
+
+            <section id="mapa-section">
+                <div class="section-heading">
+                    <h2>Mapa logístico interativo</h2>
+                    <span>Pará e Maranhão</span>
+                </div>
+
+                <div class="map-panel">
+                    <div class="map-toolbar"><div class="map-filter-bar" role="group" aria-label="Camadas do mapa">
+                        <button type="button" class="map-filter active" data-camada="geral">Visão geral</button>
+                        <button type="button" class="map-filter" data-camada="minas">Minas</button>
+                        <button type="button" class="map-filter" data-camada="destinos">Destinos</button>
+                        <button type="button" class="map-filter" data-camada="terminais">Terminais</button>
+                        <button type="button" class="map-filter" data-camada="fluxos">Fluxos</button>
+                    </div>
+
+                    <div class="legend">
+                        <span><i style="background:#d9aa50"></i> Minas</span>
+                        <span><i style="background:#71b9ec"></i> Destinos</span>
+                        <span><i style="background:#6dd4ab"></i> Terminais</span><span><i class="flow-key"></i> Fluxos</span>
+                    </div>
+
+                    </div><div id="mapa" aria-label="Mapa de minas, destinos, terminais e fluxos"></div><p class="map-note">Os fluxos são demonstrativos. As linhas indicam conexões entre origens e destinos.</p>
+                </div>
+            </section>
+
+            <section>
+                <div class="section-heading">
+                    <h2>Análise de desempenho</h2>
+
+                </div>
+
+                <div class="charts-grid">
+                    <article class="chart-card">
+                        <h3>Produção por unidade mineral</h3>
+                        <canvas id="graficoProducao"></canvas>
+                    </article>
+
+                    <article class="chart-card" id="custos-section">
+                        <h3>Comparativo de custos logísticos</h3>
+                        <canvas id="graficoCustos"></canvas>
+                    </article>
+                </div>
+            </section>
+
+            <section id="rotas-section">
+                <div class="section-heading">
+                    <h2>Planejamento de transporte</h2>
+                    <span>Simulação de alternativas logísticas</span>
+                </div>
+
+                <div class="panel">
+                    <h2>Calcular rota mineral</h2>
+
+                    <form id="formRota">
+                        <div class="form-grid">
+
+                            <div class="form-field">
+                                <label for="origem">Origem</label>
+                                <select id="origem" name="origem" required>
+                                    <option value="">Selecione a origem</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="destino">Destino</label>
+                                <select id="destino" name="destino" required>
+                                    <option value="">Selecione o destino</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field full">
+                                <label for="toneladas">Quantidade transportada (toneladas)</label>
+                                <input
+                                    type="number"
+                                    id="toneladas"
+                                    name="toneladas"
+                                    min="1"
+                                    step="1"
+                                    value="1000"
+                                    required
+                                >
+                            </div>
+
+                        </div>
+
+                        <div class="route-actions">
+                            <button type="submit">Calcular rota</button>
+                            <button type="reset" class="secondary">Limpar campos</button>
+                        </div>
+                    </form>
+
+                    <div id="resultadoRota"></div>
+                </div>
+            </section>
+
+            <section id="terminais-section">
+                <div class="section-heading">
+                    <h2>Análise de terminais</h2>
+                    <span>Estudo de localização</span>
+                </div>
+
+                <div class="panel">
+                    <h2>Identificação de locais estratégicos</h2>
+                    <p style="color:#8292a4;font-size:12px;margin-bottom:15px">
+                        Analise os candidatos considerando capacidade, acesso e distância.
+                    </p>
+
+                    <button type="button" id="btnTerminais">
+                        Analisar alternativas de terminais
+                    </button>
+
+                    <div id="resultadoTerminais"></div>
+                </div>
+            </section>
+
+            <section id="fluxos-section">
+                <div class="section-heading">
+                    <h2>Fluxos de transporte mineral</h2>
+                    <span>Conexões entre unidades e destinos</span>
+                </div>
+
+                <div class="panel">
+                    <h2>Distribuição logística</h2>
+                    <p style="color:#8292a4;font-size:12px">
+                        Visualização dos fluxos e alternativas de escoamento mineral.
+                    </p>
+                </div>
+            </section>
+
+            <section id="relatorios-section">
+                <div class="section-heading">
+                    <h2>Relatórios do sistema</h2>
+                    <span>Exportação e impressão</span>
+                </div>
+
+                <div class="panel report-area">
+                    <div>
+                        <h2>Relatório logístico</h2>
+                        <p>Gere uma versão para impressão dos dados apresentados no painel.</p>
+                    </div>
+
+                    <button type="button" onclick="window.print()">
+                        Imprimir relatório
+                    </button>
+                </div>
+            </section>
+
+        </div>
+
+        <footer>
+            MineralFlow — Sistema de Gestão Logística Mineral
+        </footer>
+
+    </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>
+
